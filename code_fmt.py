@@ -75,8 +75,11 @@ def mkdir_and_bcp(dir):
 back_folder_name = 'sources_backup'
 mkdir_and_bcp(back_folder_name)
 
-print(' Your code files are backuped in\n --> [./' + back_folder_name
+print('\n Your code files are backuped in\n --> [./' + back_folder_name
     + '] <-- folder \n in your work derectory, check for necessory\n')
+
+# change the working derectory into the backup folder
+os.chdir(back_folder_name)
 
 print(' Formarting your code ...\n')
 
@@ -110,10 +113,13 @@ def spaces_insert(str2fmt, index, num):
 
 for each in fileList:
     file = open(each)
-    w_file = open('write.h','wt')
+    w_file = open('../' + 'test','wt')
 
     stack = []
     new_style = []
+    new_tmp = []
+
+    index_max = 0
 
     while True:
         line = file.readline()
@@ -123,14 +129,54 @@ for each in fileList:
 
         new_line = fmt_tab2spaces(line)
 
-        index = index_of_slash_symbol(new_line)
+        if '{' in new_line:
+            stack.append('{')
 
-        print(index)
+            if '}' in new_line:
+                stack.pop()
 
-        if(4 < index):
-            new_style.append(spaces_insert(new_line, index, 10))
+                if stack:
+                    index = index_of_slash_symbol(new_line)
+
+                    if(index >= index_max):
+                        index_max = index
+
+                    new_tmp.append(new_line)
+
+                    continue
+                else:
+                    # deal new_tmp list
+                    for ii in new_tmp:
+                        cur_index = index_of_slash_symbol(new_line)
+                        if(cur_index <= 4):
+                            new_style.append(ii)
+                        else:
+                            new_style.append(spaces_insert(ii, cur_index, 5 + index_max - cur_index))
+
+                    index_max = 0
+                    continue
+            else:
+                new_tmp.append(new_line)
+                continue
+        else:
+            new_style.append(new_line)
             continue
 
+
+
+
+
+        # index = index_of_slash_symbol(new_line)
+
+        # if(index >= index_max):
+        #     index_max = index
+
+        # if(4 < index):
+        #     new_style.append(spaces_insert(new_line, index, 10))
+        #     continue
+
+
+    print(index_max)
 
     for i in new_style:
         # print(i)
